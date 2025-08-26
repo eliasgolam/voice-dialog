@@ -1,0 +1,7 @@
+{
+  "name": "CREATE_CUSTOMER",
+  "required": ["firstName", "lastName"]
+}
+
+
+

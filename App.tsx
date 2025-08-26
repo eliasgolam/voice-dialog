@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -15,7 +15,9 @@ import {
   Text,
   useColorScheme,
   View,
+  Pressable,
 } from 'react-native';
+import VoicePopup from './src/ui/VoicePopup';
 
 import {
   Colors,
@@ -62,6 +64,8 @@ function App(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const [show, setShow] = useState(false);
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -92,6 +96,13 @@ function App(): React.JSX.Element {
           <LearnMoreLinks />
         </View>
       </ScrollView>
+      <Pressable
+        onPress={() => setShow(true)}
+        style={{position:'absolute', right:24, bottom:24, width:56, height:56, borderRadius:28, backgroundColor:'#8C3B4A', justifyContent:'center', alignItems:'center'}}
+      >
+        <Text style={{color:'#fff'}}>🗣️</Text>
+      </Pressable>
+      <VoicePopup visible={show} onClose={() => setShow(false)} />
     </SafeAreaView>
   );
 }
