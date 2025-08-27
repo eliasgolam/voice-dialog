@@ -1,7 +1,7 @@
-import { nlu } from '../services/nlu';
 import { speak, stopSpeaking } from '../services/tts';
 import { logEvent } from '../services/telemetry';
 import * as Actions from '../services/actions';
+import { DialogEngine } from '../../packages/dialog-core/src/index';
 
 export type DialogState = 'idle' | 'listening' | 'thinking' | 'speaking';
 
@@ -17,9 +17,11 @@ export type DialogManagerOptions = {
 export class DialogManager {
   private state: DialogState = 'idle';
   private onState?: (state: DialogState) => void;
+  private engine: DialogEngine;
 
   constructor(options?: DialogManagerOptions) {
     this.onState = options?.onState;
+    this.engine = new DialogEngine();
   }
 
   private setState(next: DialogState) {
@@ -34,15 +36,10 @@ export class DialogManager {
   async handleUserText(text: string): Promise<void> {
     this.setState('thinking');
     logEvent('user_input', { text });
-    const res = await nlu(text);
-    logEvent('nlu_result', { reply: res.reply, tool: res.tool, needFollowup: res.needFollowup });
-
-    if (res.tool && !res.needFollowup) {
-      await this.runTool(res.tool as Tool);
-    }
-
+    const turn = await this.engine.handleInput(text);
+    logEvent('engine_reply', { text: turn.text });
     this.setState('speaking');
-    await speak(res.reply);
+    await speak(turn.text);
     this.setState('idle');
   }
 
