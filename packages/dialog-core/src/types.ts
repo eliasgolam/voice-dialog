@@ -1,5 +1,7 @@
 export type Role = 'user' | 'assistant' | 'system';
 
+export type IntentName = 'greet' | 'time' | 'help' | 'fallback' | 'create_customer' | 'invoice' | 'rapport';
+
 export interface Turn {
   role: Role;
   text: string;
