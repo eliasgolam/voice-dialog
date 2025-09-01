@@ -1,0 +1,16 @@
+{
+  "name": "SET_APPOINTMENT",
+  "description": "Termin mit Kunde vereinbaren.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "kunde": { "type": "string" },
+      "datum": { "type": "string", "format": "date" },
+      "zeit": { "type": "string" },
+      "ort": { "type": "string" },
+      "zweck": { "type": "string" }
+    },
+    "required": ["kunde", "datum", "zeit"]
+  }
+}
+

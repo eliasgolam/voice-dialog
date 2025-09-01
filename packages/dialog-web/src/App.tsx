@@ -1,6 +1,5 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { 
-  DialogEngine, 
   Turn, 
   DialogState, 
   StateAction, 
@@ -9,11 +8,9 @@ import {
   detectIntent,
   IntentMatch
 } from '@secondbrain/dialog-core';
+import { handleUserText } from '../../../src/dialog/controller';
 
 export default function App() {
-  const engineRef = useRef<DialogEngine>();
-  if (!engineRef.current) engineRef.current = new DialogEngine();
-  const engine = engineRef.current;
 
   // Debug State Management
   const [debugState, setDebugState] = useState<DialogState>(initialState);
@@ -39,7 +36,8 @@ export default function App() {
 
   const [input, setInput] = useState('');
   const [history, setHistory] = useState<Turn[]>([]);
-  const [flowState, setFlowState] = useState<{ activeFlowId: string | null; currentSlotId: string | null }>({ activeFlowId: null, currentSlotId: null });
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const sessionId = 'web-dev-1';
 
   const speak = useMemo(() => (text: string) => {
     try {
@@ -49,8 +47,8 @@ export default function App() {
     } catch {}
   }, []);
 
-  async function onSend() {
-    const t = input.trim();
+  async function onSend(textOverride?: string) {
+    const t = (textOverride ?? input).trim();
     if (!t) return;
     console.debug("onSend called with:", t);
     setInput('');
@@ -86,12 +84,10 @@ export default function App() {
     };
     setDebugLog(prev => [...prev, debugEntry]);
     
-    const res = engine.dispatch({ type: 'USER_TEXT', text: t });
-    const turn = res.turn!;
-    setHistory((h) => [...h, { role: 'user', text: t }, turn]);
-    const ctx = engine.getContext();
-    setFlowState({ activeFlowId: ctx.activeFlowId, currentSlotId: ctx.currentSlotId });
-    speak(turn.text);
+    const res = await handleUserText(t, sessionId);
+    setHistory((h) => [...h, { role: 'user', text: t }, { role: 'assistant', text: res.text }]);
+    setSuggestions(res.suggestions ?? []);
+    speak(res.text);
   }
 
   // Debug Panel Functions
@@ -152,7 +148,7 @@ export default function App() {
   }
 
   const getTop3Intents = useCallback(() => {
-    // Use actual NLU system with current input
+    // Use actual NLU system with current input but WITHOUT onDebug side effects during render
     if (!input.trim()) {
       return [
         { intent: 'create_customer', score: 0.95 },
@@ -160,10 +156,8 @@ export default function App() {
         { intent: 'rapport', score: 0.75 }
       ];
     }
-    
     try {
-      // Use runDetect for robust NLU processing
-      const matches = runDetect(input);
+      const matches = detectIntent(input);
       return matches?.map((match: any) => ({
         intent: match.intent || match.name,
         score: match.score || 0
@@ -173,7 +167,6 @@ export default function App() {
         { intent: 'rapport', score: 0.75 }
       ];
     } catch (error) {
-      // Fallback to default intents if NLU fails
       return [
         { intent: 'create_customer', score: 0.95 },
         { intent: 'invoice', score: 0.85 },
@@ -202,7 +195,13 @@ export default function App() {
               </div>
             </div>
           ))}
-          <div style={{marginTop: 8, color:'#777', fontSize: 12}}>Status: {flowState.activeFlowId ?? '-'} / {flowState.currentSlotId ?? '-'}</div>
+          {suggestions.length > 0 && (
+            <div style={{display:'flex', gap:8, flexWrap:'wrap', marginTop: 8}}>
+              {suggestions.map((s) => (
+                <button key={s} onClick={() => onSend(s)} style={{padding:'6px 10px', borderRadius:8, border:'1px solid #ccc', background:'#fafafa'}}>{s}</button>
+              ))}
+            </div>
+          )}
         </div>
         <form onSubmit={onSubmit} style={{display:'flex', gap: 8, marginTop: 12}}>
           <input

@@ -1,6 +1,16 @@
 {
   "name": "CREATE_CUSTOMER",
-  "required": ["firstName", "lastName"]
+  "description": "Lege ein Kundendossier an.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "firstName": { "type": "string" },
+      "lastName": { "type": "string" },
+      "telefon": { "type": "string" },
+      "adresse": { "type": "string" }
+    },
+    "required": ["firstName", "lastName"]
+  }
 }
 
 

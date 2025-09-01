@@ -25,4 +25,10 @@ const getEnvVar = (key: string): string | undefined => {
 export const env = {
   elevenLabsApiKey: normalize(getEnvVar('ELEVEN_API_KEY')),
   elevenLabsVoiceId: normalize(getEnvVar('ELEVEN_VOICE_ID')) || 'EXAVITQu4vr4xnSDxMaL',
+  openaiApiKey: normalize(getEnvVar('OPENAI_API_KEY')),
+  forceExecuteOnYes: (normalize(getEnvVar('FORCE_EXECUTE_ON_YES')) || 'true').toLowerCase() === 'true',
 };
+
+if (!env.openaiApiKey) {
+  console.warn('[env] OPENAI_API_KEY fehlt – GPT/Whisper verwenden Fallbacks.');
+}

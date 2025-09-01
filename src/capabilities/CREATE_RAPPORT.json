@@ -1,0 +1,15 @@
+{
+  "name": "CREATE_RAPPORT",
+  "description": "Lege einen Tagesrapport an.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "kunde": { "type": "string", "description": "Name des Kunden" },
+      "datum": { "type": "string", "description": "YYYY-MM-DD", "format": "date" },
+      "zeit": { "type": "string", "description": "z.B. 09:00" },
+      "beschreibung": { "type": "string" }
+    },
+    "required": ["kunde"]
+  }
+}
+

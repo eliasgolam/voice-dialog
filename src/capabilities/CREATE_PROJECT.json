@@ -1,0 +1,16 @@
+{
+  "name": "CREATE_PROJECT",
+  "description": "Neues Projekt anlegen.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "kunde": { "type": "string" },
+      "projekt": { "type": "string" },
+      "start": { "type": "string", "description": "YYYY-MM-DD", "format": "date" },
+      "beschreibung": { "type": "string" }
+    },
+    "required": ["kunde", "projekt"]
+  }
+}
+
+

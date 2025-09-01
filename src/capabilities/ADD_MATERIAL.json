@@ -1,0 +1,16 @@
+{
+  "name": "ADD_MATERIAL",
+  "description": "Material zu einem Kundenauftrag hinzufügen.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "kunde": { "type": "string" },
+      "artikel": { "type": "string" },
+      "menge": { "type": "number" },
+      "einheit": { "type": "string" },
+      "preis": { "type": "number" }
+    },
+    "required": ["kunde", "artikel", "menge"]
+  }
+}
+
